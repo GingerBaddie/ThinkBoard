@@ -7,6 +7,7 @@ import NoteCard from '../components/NoteCard';
 import NoteDetailPage from './NoteDetailPage';
 import NotesNotFound from '../components/NotesNotFound';
 import { LoaderIcon } from 'lucide-react';
+import api from '../libs/axios';
 
 function HomePage() {
     const [isRateLimited, setIsRateLimited] = useState(false);
@@ -16,7 +17,7 @@ function HomePage() {
     useEffect(() => {
         const fetchNotes = async () => {
             try {
-               const res = await axios.get('http://localhost:5001/api/notes');
+               const res = await api.get('/notes');
                setNotes(res.data);
                setIsRateLimited(false);
 
