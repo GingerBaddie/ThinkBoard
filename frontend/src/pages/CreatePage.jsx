@@ -1,16 +1,28 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router';
 import { ArrowLeftIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import api from '../libs/axios';
+import { AuthContext } from '../context/AuthContext';
+
 
 function CreatePage() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const {user, loading: authLoading} = useContext(AuthContext);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (authLoading) return;
+
+        if(!user) {
+            navigate('/login');
+        }
+    },[authLoading, user, navigate])
+
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,8 +40,11 @@ function CreatePage() {
            toast.success("Note created succesfully");
            navigate('/'); 
         } catch (error) {
-            console.log('error creating note', error.message);
-            toast.error('Failed to create note');
+            // console.log('error creating note', error.message);
+            // toast.error('Failed to create note');
+            toast.error(
+            error.response?.data?.message || "Failed to create note"
+            );
             
         } finally {
             setLoading(false);

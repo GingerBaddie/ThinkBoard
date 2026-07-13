@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/GingerBaddie/ThinkBoard/issues"
   },
-  "homepage": "https://github.com/GingerBaddie/ThinkBoard#readme"
+  "homepage": "https://github.com/GingerBaddie/ThinkBoard#readme",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3"
+  }
 }

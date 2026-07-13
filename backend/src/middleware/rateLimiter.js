@@ -4,7 +4,7 @@ import ratelimit from "../config/upstash.js";
 const rateLimiter = async (req, res, next) => {
     // per user 
 try {
-    const {success} = await ratelimit.limit('my-limit-key')
+    const {success} = await ratelimit.limit(req.user._id.toString());
 
     if(!success) {
         return res.status(429).json({
@@ -14,7 +14,7 @@ try {
 
     next();
 } catch (error) {
-    console.log("rate limiter error", error.message);
+    console.error("rate limiter error", error);
     next(error);
 }
 }

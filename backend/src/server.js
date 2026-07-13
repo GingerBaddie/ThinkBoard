@@ -1,10 +1,11 @@
 import express from 'express'
 import notesRoutes from './routes/notesRoutes.js'
+import usersRoutes from './routes/usersRoutes.js'
 import { connectDB } from './config/db.js';
 import dotenv from 'dotenv'
-import rateLimiter from './middleware/rateLimiter.js';
 import cors from 'cors'
 import path from 'path'
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 
@@ -15,19 +16,17 @@ const __dirname = path.resolve()
 
 if(process.env.NODE_ENV !== 'production') {
     app.use(cors({
-    origin: 'http://localhost:5173'
+    origin: 'http://localhost:5173',
+    credentials: true,
     }));
 }
 
-app.use(cors({
-    origin: 'http://localhost:5173'
-}));
 app.use(express.json()); // middleware for parsing json
-app.use(rateLimiter) // middleware for rate limiting
+app.use(cookieParser());
 
-connectDB();
 
-app.use('/api/notes',notesRoutes);
+app.use('/api/notes', notesRoutes);
+app.use('/api/users', usersRoutes);
 
 if(process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/dist')));

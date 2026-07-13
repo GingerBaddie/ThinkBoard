@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Navbar from '../components/Navbar';
 import RateLimitedUI from '../components/RateLimitedUI';
 import axios from 'axios'
@@ -8,13 +8,17 @@ import NoteDetailPage from './NoteDetailPage';
 import NotesNotFound from '../components/NotesNotFound';
 import { LoaderIcon } from 'lucide-react';
 import api from '../libs/axios';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router';
+
 
 function HomePage() {
-    const [isRateLimited, setIsRateLimited] = useState(false);
-    const [notes, setNotes] = useState([]);
-    const [loading, setLoading] = useState(true);
+
+    const {user, loading: authLoading} = useContext(AuthContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
+    
         const fetchNotes = async () => {
             try {
                const res = await api.get('/notes');
@@ -22,7 +26,7 @@ function HomePage() {
                setIsRateLimited(false);
 
             } catch (error) {
-                console.log('Error fetching notes', error.message);
+                console.error('Error fetching notes', error);
                 if(error.response?.status === 429) {
                     setIsRateLimited(true);
                 }
@@ -35,11 +39,34 @@ function HomePage() {
                 setLoading(false);
             }
         }
+    
+    if (authLoading) {
+        return;
+    }
 
-        fetchNotes();
-    },[])
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+
+    fetchNotes();
+}, [authLoading, user, navigate]);
+
+    const [isRateLimited, setIsRateLimited] = useState(false);
+    const [notes, setNotes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    if (authLoading) {
+    return (
+        <div className="min-h-screen bg-base-200 flex items-center justify-center">
+            <LoaderIcon className="animate-spin size-10" />
+        </div>
+    );
+}
+
     return (
         <div>
+            
             <Navbar />
 
             {isRateLimited && <RateLimitedUI />}
